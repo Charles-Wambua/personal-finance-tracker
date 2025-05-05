@@ -1,22 +1,55 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import { message, Button } from "antd";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";  // Import useNavigate
 
 const Register = () => {
     const [formData, setFormData] = useState({
         name: "",
         email: "",
         password: "",
-        confirmPassword: "",
+        confirm_password: "",
     });
+
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const navigate = useNavigate();  // Initialize useNavigate
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        console.log("Form submitted:", formData);
+        setIsSubmitting(true);
+
+        if (formData.password !== formData.confirm_password) {
+            message.error("Passwords do not match.");
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                "http://127.0.0.1:8000/api/auth/register/",
+                formData
+            );
+
+            // If registration is successful
+            message.success("Registration successful!");
+
+            // Redirect the user after successful registration
+            navigate("/login");  // Redirect to login page (or another page)
+
+            console.log(response.data); // Store the token or other details as needed
+        } catch (error) {
+            message.error("Registration failed. Please try again.");
+            console.error("There was an error registering the user:", error);
+            console.log("data to backend", formData);
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -60,19 +93,21 @@ const Register = () => {
                     />
                     <input
                         type="password"
-                        name="confirmPassword"
+                        name="confirm_password"
                         placeholder="Confirm Password"
-                        value={formData.confirmPassword}
+                        value={formData.confirm_password}
                         onChange={handleChange}
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-white/60 backdrop-blur-sm"
                         required
                     />
-                    <button
-                        type="submit"
+                    <Button
+                        type="primary"
+                        htmlType="submit"
                         className="w-full py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all"
+                        loading={isSubmitting}
                     >
                         Register
-                    </button>
+                    </Button>
                 </form>
                 <p className="mt-4 text-sm text-gray-500 text-center">
                     Already have an account?{" "}

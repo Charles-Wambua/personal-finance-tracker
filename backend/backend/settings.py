@@ -41,9 +41,12 @@ INSTALLED_APPS = [
     'knox',
     'core',
     'django.contrib.sites',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
+      'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -73,18 +76,48 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': ('knox.auth.TokenAuthentication',)
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'knox.auth.TokenAuthentication',
+    ]
 }
+
+
+
+CORS_ALLOW_ALL_ORIGINS = True
+
+
+AUTH_USER_MODEL = 'core.User'  # or 'core.models.User' if needed
+
+
+
+
+
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# AUTHENTICATION_BACKENDS = [
+#     'knox.auth.TokenAuthentication',
+# ]
+
+AUTHENTICATION_BACKENDS = [
+    'core.auth_backend.EmailBackend',  # Your custom backend
+    'django.contrib.auth.backends.ModelBackend',  # Fallback for admin login etc.
+]
+
+
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'personal_finance_tracker',
+        'USER': 'postgres',
+        'PASSWORD': 'Charlie98',
+        'HOST': 'localhost',
+        'PORT': '5432',  # Default PostgreSQL port
     }
 }
+
 
 
 # Password validation

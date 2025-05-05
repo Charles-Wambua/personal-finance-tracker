@@ -1,12 +1,8 @@
-import React, { useState } from "react";
+import React from "react";
 import SummaryCards from "./SummaryCards";
 import ExpenseChart from "./ExpenseChart";
-import FilterBar from "./FilterBar";
 
 const Dashboard = () => {
-    const [selectedMonth, setSelectedMonth] = useState("May");
-
-    // Dummy data for demo
     const income = 5000;
     const expenses = 2600;
     const expensesByCategory = {
@@ -19,8 +15,10 @@ const Dashboard = () => {
 
     return (
         <div className="p-4 max-w-5xl mx-auto">
-            <FilterBar selectedMonth={selectedMonth} onChange={setSelectedMonth} />
+            {/* Summary cards */}
             <SummaryCards income={income} expenses={expenses} />
+
+            {/* Expense chart */}
             <ExpenseChart expensesByCategory={expensesByCategory} />
         </div>
     );

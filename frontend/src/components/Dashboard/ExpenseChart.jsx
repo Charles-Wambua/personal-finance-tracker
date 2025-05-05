@@ -27,11 +27,32 @@ const ExpenseChart = ({ expensesByCategory }) => {
         ],
     };
 
+    const options = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: "bottom",
+                labels: {
+                    padding: 20,
+                    boxWidth: 20,
+                    font: {
+                        size: 14,
+                    },
+                },
+            },
+        },
+    };
+
     return (
-        <div className="bg-white p-6 rounded-2xl shadow-md mt-6 sm:w-full md:w-11/12 lg:w-10/12 xl:w-8/12 mx-auto">
-            <h3 className="text-lg font-semibold text-gray-700 mb-4 text-center">Expenses by Category</h3>
-            <div className="w-full h-72 sm:h-80 md:h-96 xl:h-80"> {/* Tailwind's responsive height classes */}
-                <Pie data={data} options={{ responsive: true, maintainAspectRatio: true }} />
+        <div className="bg-white p-6 rounded-2xl shadow-md mt-6 w-full max-w-3xl mx-auto">
+            <h3 className="text-xl font-semibold text-gray-700 mb-6 text-center">
+                Expenses by Category
+            </h3>
+            <div className="flex justify-center items-center h-[400px] sm:h-[450px] md:h-[500px]">
+                <div className="w-full h-full relative">
+                    <Pie data={data} options={options} />
+                </div>
             </div>
         </div>
     );

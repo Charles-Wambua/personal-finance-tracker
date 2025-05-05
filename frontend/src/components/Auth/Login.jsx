@@ -1,13 +1,40 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
+import { message, Spin } from "antd";
+import { useNavigate } from "react-router-dom"; // For redirection
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleLogin = (e) => {
+    const navigate = useNavigate(); // Navigation hook
+
+    const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Logging in with", { email, password });
+        setLoading(true);
+
+        try {
+            const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
+                email,
+                password,
+            });
+
+            localStorage.setItem("token", response.data.token);
+            message.success("Login successful!");
+            navigate("/dashboard"); // Redirect on success
+        } catch (error) {
+            if (error.response) {
+                message.error(error.response.data.detail || "Login failed!");
+                console.log("frontend data sent to backend", { email, password });
+            } else {
+                message.error("An error occurred, please try again.");
+            }
+            console.log("Error logging in:", error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -28,6 +55,7 @@ const Login = () => {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-white/60 backdrop-blur-sm"
+                        required
                     />
                     <input
                         type="password"
@@ -35,12 +63,14 @@ const Login = () => {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all bg-white/60 backdrop-blur-sm"
+                        required
                     />
                     <button
                         type="submit"
-                        className="w-full py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all"
+                        disabled={loading}
+                        className="w-full py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all flex justify-center items-center"
                     >
-                        Login
+                        {loading ? <Spin size="small" /> : "Login"}
                     </button>
                 </form>
                 <p className="mt-4 text-sm text-gray-500 text-center">
