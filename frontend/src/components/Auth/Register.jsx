@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { message, Button } from "antd";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
+import { useNavigate } from "react-router-dom";  
+import { useAuth } from "../../context/AuthContext";  
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -13,7 +13,8 @@ const Register = () => {
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const navigate = useNavigate();  // Initialize useNavigate
+    const { register } = useAuth(); 
+    const navigate = useNavigate();  
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -31,22 +32,11 @@ const Register = () => {
         }
 
         try {
-            const response = await axios.post(
-                "http://127.0.0.1:8000/api/auth/register/",
-                formData
-            );
-
-            // If registration is successful
+            await register(formData);  
             message.success("Registration successful!");
-
-            // Redirect the user after successful registration
-            navigate("/login");  // Redirect to login page (or another page)
-
-            console.log(response.data); // Store the token or other details as needed
+            navigate("/login");  
         } catch (error) {
             message.error("Registration failed. Please try again.");
-            console.error("There was an error registering the user:", error);
-            console.log("data to backend", formData);
         } finally {
             setIsSubmitting(false);
         }
@@ -104,13 +94,13 @@ const Register = () => {
                         type="primary"
                         htmlType="submit"
                         className="w-full py-3 bg-blue-500 text-white font-semibold rounded-xl hover:bg-blue-600 transition-all"
-                        loading={isSubmitting}
+                        disabled={isSubmitting}
                     >
-                        Register
+                        {isSubmitting ? "Registering..." : "Register"}
                     </Button>
                 </form>
                 <p className="mt-4 text-sm text-gray-500 text-center">
-                    Already have an account?{" "}
+                    Already registered?{" "}
                     <a href="/login" className="text-blue-500 hover:underline">
                         Login
                     </a>

@@ -1,37 +1,23 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
-import axios from "axios";
 import { message, Spin } from "antd";
-import { useNavigate } from "react-router-dom"; // For redirection
+import { useAuth } from "../../context/AuthContext"; 
 
 const Login = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const navigate = useNavigate(); // Navigation hook
+    const { login } = useAuth(); 
 
     const handleLogin = async (e) => {
         e.preventDefault();
         setLoading(true);
 
         try {
-            const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
-                email,
-                password,
-            });
-
-            localStorage.setItem("token", response.data.token);
-            message.success("Login successful!");
-            navigate("/dashboard"); // Redirect on success
+            await login(email, password); 
         } catch (error) {
-            if (error.response) {
-                message.error(error.response.data.detail || "Login failed!");
-                console.log("frontend data sent to backend", { email, password });
-            } else {
-                message.error("An error occurred, please try again.");
-            }
-            console.log("Error logging in:", error);
+            message.error("Login failed. Please try again.");
         } finally {
             setLoading(false);
         }

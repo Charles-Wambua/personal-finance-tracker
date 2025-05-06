@@ -12,7 +12,6 @@ const FilterBar = ({
 }) => {
     return (
         <div className="flex justify-between mb-4 space-x-4">
-            {/* Month Filter */}
             <select
                 value={selectedMonth}
                 onChange={(e) => onMonthChange(e.target.value)}
@@ -26,9 +25,7 @@ const FilterBar = ({
                 ))}
             </select>
 
-            {/* Category Filter */}
             <select
-                // value={selectedCategory}
                 onChange={(e) => onCategoryChange(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-xl bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
             >
@@ -39,8 +36,7 @@ const FilterBar = ({
                     </option>
                 ))}
             </select>
-
-            {/* Transaction Type Filter */}
+=
             <select
                 value={transactionType}
                 onChange={(e) => onTransactionTypeChange(e.target.value)}
@@ -50,8 +46,7 @@ const FilterBar = ({
                 <option value="Income">Income</option>
                 <option value="Expense">Expense</option>
             </select>
-
-            {/* Date Range Filter */}
+=
             <input
                 type="date"
                 value={dateRange[0] || ""}

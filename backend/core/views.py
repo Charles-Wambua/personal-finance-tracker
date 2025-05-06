@@ -13,9 +13,9 @@ from .serializers import (
 )
 
 
-# =======================
+
 # USER AUTH VIEWS
-# =======================
+
 
 class RegisterAPI(generics.CreateAPIView):
     serializer_class = RegisterSerializer
@@ -46,9 +46,8 @@ class LoginAPI(generics.GenericAPIView):
         })
 
 
-# =======================
 # CATEGORY CRUD VIEWS
-# =======================
+
 
 class CategoryListCreateAPI(generics.ListCreateAPIView):
     serializer_class = CategorySerializer
@@ -64,15 +63,15 @@ class CategoryListCreateAPI(generics.ListCreateAPIView):
 class CategoryRetrieveUpdateDestroyAPI(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CategorySerializer
     permission_classes = [permissions.IsAuthenticated]
-    lookup_field = 'id'  # Use UUID or `pk` depending on your model
+    lookup_field = 'id'  
 
     def get_queryset(self):
         return Category.objects.filter(user=self.request.user)
 
 
-# =======================
+
 # TRANSACTION CRUD VIEWS
-# =======================
+
 
 class TransactionListCreateAPI(generics.ListCreateAPIView):
     serializer_class = TransactionSerializer

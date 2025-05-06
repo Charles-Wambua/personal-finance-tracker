@@ -8,9 +8,8 @@ from .transaction_model.transaction import Transaction
 
 
 
-# --------------------------
 # User Registration
-# --------------------------
+
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(write_only=True)
     password = serializers.CharField(write_only=True)
@@ -61,9 +60,9 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
 
-# --------------------------
+
 # User Login
-# --------------------------
+
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField(write_only=True)
@@ -82,9 +81,9 @@ class LoginSerializer(serializers.Serializer):
         }
 
 
-# --------------------------
-# Category Serializer
-# --------------------------
+
+# Category 
+
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
@@ -92,24 +91,11 @@ class CategorySerializer(serializers.ModelSerializer):
         read_only_fields = ['id', 'created_at']
 
 
-# --------------------------
-# Transaction Serializer
-# --------------------------
+
+# Transaction 
+
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ['id', 'amount', 'category', 'category_id', 'type', 'date', 'created_at']
+        fields = ['id', 'amount', 'category', 'category_id', 'type', 'date', 'created_at', 'recurring', 'recurring_frequency']
         read_only_fields = ['id', 'created_at']
-
-# class TransactionSerializer(serializers.ModelSerializer):
-#     category = CategorySerializer(read_only=True)
-#     category_id = serializers.PrimaryKeyRelatedField(
-#         queryset=Category.objects.all(),
-#         write_only=True,
-#         source='category'
-#     )
-
-#     class Meta:
-#         model = Transaction
-#         fields = ['id', 'amount', 'category', 'category_id', 'type', 'date', 'created_at']
-#         read_only_fields = ['id', 'created_at']

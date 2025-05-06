@@ -2,18 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Input, Select, DatePicker, message, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
-import axios from "axios";
+import axiosInstance from "../../utils/axiosInstance";
 
 const { Option } = Select;
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-const token = localStorage.getItem("token");
-
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    Authorization: token ? `Token ${token}` : "",
-  },
-});
 
 const TransactionList = () => {
   const [transactions, setTransactions] = useState([]);
@@ -146,6 +137,32 @@ const TransactionList = () => {
           {type.toUpperCase()}
         </span>
       ),
+    },
+    {
+      title: "Recurring",
+      dataIndex: "recurring",
+      key: "recurring",
+      render: (recurring) =>
+        recurring ? (
+          <Tag color="green" className="rounded-md px-2 py-1 text-sm">
+            Yes
+          </Tag>
+        ) : (
+          <Tag color="default" className="rounded-md px-2 py-1 text-sm">
+            No
+          </Tag>
+        ),
+    },
+    {
+      title: "Frequency",
+      dataIndex: "recurring_frequency",
+      key: "recurring_frequency",
+      render: (freq, record) =>
+        record.recurring ? (
+          <span className="text-xs text-gray-600 capitalize">{freq}</span>
+        ) : (
+          <span className="text-xs text-gray-400 italic">N/A</span>
+        ),
     },
     {
       title: "Action",

@@ -1,24 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { Form, Input, Button, DatePicker, Select, message } from "antd";
-import axios from "axios";
+import { Form, Input, Button, DatePicker, Select, Checkbox, message } from "antd";
 import dayjs from "dayjs";
+import axiosInstance from "../../utils/axiosInstance";
 
 const { Option } = Select;
-const API_BASE_URL = "http://127.0.0.1:8000/api";
-const token = localStorage.getItem("token");
-
-const axiosInstance = axios.create({
-  baseURL: API_BASE_URL,
-  headers: {
-    Authorization: token ? `Token ${token}` : "",
-  },
-});
 
 const TransactionForm = ({ initialTransaction, onSuccess }) => {
   const [form] = Form.useForm();
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState([]);
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringFrequency, setRecurringFrequency] = useState("monthly");
 
   useEffect(() => {
     fetchCategories();
@@ -42,12 +35,16 @@ const TransactionForm = ({ initialTransaction, onSuccess }) => {
         date: dayjs(initialTransaction.date),
         type: initialTransaction.type,
         category: initialTransaction.category.id,
+        recurring: initialTransaction.recurring || false,
+        recurringFrequency: initialTransaction.recurring_frequency || "monthly",
       });
+      setIsRecurring(initialTransaction.recurring || false);
+      setRecurringFrequency(initialTransaction.recurring_frequency || "monthly");
     }
   }, [initialTransaction, form]);
 
   const handleFormSubmit = async (values) => {
-    const { amount, date, type, category } = values;
+    const { amount, date, type, category, recurring, recurringFrequency } = values;
 
     if (!amount || !date || !type || !category) {
       return message.error("Please fill in all fields.");
@@ -58,6 +55,8 @@ const TransactionForm = ({ initialTransaction, onSuccess }) => {
       date: date.format("YYYY-MM-DD"),
       type,
       category,
+      recurring: recurring || false,
+      recurring_frequency: recurring ? recurringFrequency : null,
     };
 
     try {
@@ -68,6 +67,7 @@ const TransactionForm = ({ initialTransaction, onSuccess }) => {
         message.success("Transaction updated successfully");
       } else {
         await axiosInstance.post("/transactions/", payload);
+        // console.log("Transaction added successfully", payload);
         message.success("Transaction added successfully");
       }
 
@@ -75,7 +75,7 @@ const TransactionForm = ({ initialTransaction, onSuccess }) => {
       setIsEditing(false);
       onSuccess?.();
     } catch (err) {
-        console.log("payload", payload);
+      console.log("payload", payload);
       console.error("Submit failed", err);
       message.error("Failed to save transaction");
     } finally {
@@ -113,6 +113,33 @@ const TransactionForm = ({ initialTransaction, onSuccess }) => {
             ))}
           </Select>
         </Form.Item>
+
+        <Form.Item name="recurring" valuePropName="checked" label="Is Recurring">
+          <Checkbox
+            checked={isRecurring}
+            onChange={(e) => {
+              setIsRecurring(e.target.checked);
+              form.setFieldsValue({ recurring: e.target.checked });
+            }}
+          >
+            This is a recurring transaction
+          </Checkbox>
+        </Form.Item>
+
+        {isRecurring && (
+          <Form.Item name="recurringFrequency" label="Recurring Frequency" rules={[{ required: true }]}>
+            <Select
+              placeholder="Select Recurrence Frequency"
+              className="rounded-md"
+              value={recurringFrequency}
+              onChange={setRecurringFrequency}
+            >
+              <Option value="daily">Daily</Option>
+              <Option value="weekly">Weekly</Option>
+              <Option value="monthly">Monthly</Option>
+            </Select>
+          </Form.Item>
+        )}
 
         <Button
           type="primary"
