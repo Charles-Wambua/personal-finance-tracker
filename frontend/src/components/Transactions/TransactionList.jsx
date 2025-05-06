@@ -2,15 +2,32 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Input, Select, DatePicker, message, Tag } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
+import axios from "axios";
 
 const { Option } = Select;
+const API_BASE_URL = "http://127.0.0.1:8000/api";
+const token = localStorage.getItem("token");
 
-const TransactionList = ({ transactions, categories, onDelete }) => {
-  const [filteredTransactions, setFilteredTransactions] = useState(transactions);
+const axiosInstance = axios.create({
+  baseURL: API_BASE_URL,
+  headers: {
+    Authorization: token ? `Token ${token}` : "",
+  },
+});
+
+const TransactionList = () => {
+  const [transactions, setTransactions] = useState([]);
+  const [categories, setCategories] = useState([]);
+  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCategory, setFilterCategory] = useState(null);
   const [filterDate, setFilterDate] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    fetchTransactions();
+    fetchCategories();
+  }, []);
 
   useEffect(() => {
     if (searchTerm || filterCategory || filterDate) {
@@ -18,21 +35,41 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
     } else {
       setFilteredTransactions(transactions);
     }
-  }, [searchTerm, filterCategory, filterDate, transactions]);
+  }, [searchTerm, filterCategory, filterDate, transactions, categories]);
+
+  const fetchTransactions = async () => {
+    try {
+      const res = await axiosInstance.get("/transactions/");
+      setTransactions(res.data);
+    } catch {
+      message.error("Failed to fetch transactions");
+    }
+  };
+
+  const fetchCategories = async () => {
+    try {
+      const res = await axiosInstance.get("/categories/");
+      setCategories(res.data);
+    } catch {
+      message.error("Failed to fetch categories");
+    }
+  };
 
   const handleSearch = () => {
-    let filtered = transactions;
+    let filtered = [...transactions];
 
     if (searchTerm) {
-      filtered = filtered.filter(
-        (t) =>
+      filtered = filtered.filter((t) => {
+        const cat = categories.find((c) => c.id === t.category);
+        return (
           t.amount.toString().includes(searchTerm) ||
-          t.category.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
+          (cat && cat.name.toLowerCase().includes(searchTerm.toLowerCase()))
+        );
+      });
     }
 
     if (filterCategory) {
-      filtered = filtered.filter((t) => t.category.id === filterCategory);
+      filtered = filtered.filter((t) => t.category === filterCategory);
     }
 
     if (filterDate) {
@@ -42,6 +79,16 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
     }
 
     setFilteredTransactions(filtered);
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      await axiosInstance.delete(`/transactions/${id}/`);
+      setTransactions(transactions.filter((t) => t.id !== id));
+      message.success("Transaction deleted");
+    } catch {
+      message.error("Delete failed");
+    }
   };
 
   const handleLoadMore = () => {
@@ -57,24 +104,31 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
       title: "Amount",
       dataIndex: "amount",
       key: "amount",
-      render: (amt) => <span className="text-gray-800 font-medium">${amt}</span>,
+      render: (amt) => (
+        <span className="text-gray-800 font-medium">${amt}</span>
+      ),
     },
     {
       title: "Category",
       dataIndex: "category",
       key: "category",
-      render: (cat) => (
-        <Tag color="blue" className="rounded-md px-2 py-1 text-sm">
-          {cat.name}
-        </Tag>
-      ),
+      render: (categoryId) => {
+        const category = categories.find((c) => c.id === categoryId);
+        return (
+          <Tag color="blue" className="rounded-md px-2 py-1 text-sm">
+            {category ? category.name : "Unknown"}
+          </Tag>
+        );
+      },
     },
     {
       title: "Date",
       dataIndex: "date",
       key: "date",
       render: (date) => (
-        <span className="text-gray-500">{dayjs(date).format("YYYY-MM-DD")}</span>
+        <span className="text-gray-500">
+          {dayjs(date).format("YYYY-MM-DD")}
+        </span>
       ),
     },
     {
@@ -82,7 +136,13 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
       dataIndex: "type",
       key: "type",
       render: (type) => (
-        <span className={`text-xs px-2 py-1 rounded-full ${type === "income" ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+        <span
+          className={`text-xs px-2 py-1 rounded-full ${
+            type === "income"
+              ? "bg-green-100 text-green-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
           {type.toUpperCase()}
         </span>
       ),
@@ -91,7 +151,7 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button danger type="text" onClick={() => onDelete(record.id)}>
+        <Button danger type="text" onClick={() => handleDelete(record.id)}>
           Delete
         </Button>
       ),
@@ -119,11 +179,11 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
           className="sm:w-1/4 w-full"
           allowClear
         >
-          {/* {categories.map((cat) => (
+          {categories.map((cat) => (
             <Option key={cat.id} value={cat.id}>
               {cat.name}
             </Option>
-          ))} */}
+          ))}
         </Select>
 
         <DatePicker
@@ -154,7 +214,6 @@ const TransactionList = ({ transactions, categories, onDelete }) => {
               handleLoadMore();
             }
           }}
-          className="custom-table"
         />
       </div>
     </div>

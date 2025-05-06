@@ -98,5 +98,18 @@ class CategorySerializer(serializers.ModelSerializer):
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Transaction
-        fields = ['id', 'title', 'amount', 'category', 'date', 'description', 'created_at']
+        fields = ['id', 'amount', 'category', 'category_id', 'type', 'date', 'created_at']
         read_only_fields = ['id', 'created_at']
+
+# class TransactionSerializer(serializers.ModelSerializer):
+#     category = CategorySerializer(read_only=True)
+#     category_id = serializers.PrimaryKeyRelatedField(
+#         queryset=Category.objects.all(),
+#         write_only=True,
+#         source='category'
+#     )
+
+#     class Meta:
+#         model = Transaction
+#         fields = ['id', 'amount', 'category', 'category_id', 'type', 'date', 'created_at']
+#         read_only_fields = ['id', 'created_at']

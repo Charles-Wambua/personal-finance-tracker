@@ -3,7 +3,9 @@ from .views import (
     RegisterAPI,
     LoginAPI,
     CategoryListCreateAPI,
-    TransactionSerializer
+    CategoryRetrieveUpdateDestroyAPI,  # ✅ Make sure this is imported
+      TransactionListCreateAPI,
+    TransactionRetrieveUpdateDestroyAPI,
 )
 from knox import views as knox_views
 
@@ -15,9 +17,8 @@ urlpatterns = [
 
     # Category routes
     path('categories/', CategoryListCreateAPI.as_view(), name='category-list-create'),
-    path('categories/<uuid:pk>/', CategoryListCreateAPI.as_view(), name='category-detail'),
+    path('categories/<uuid:id>/', CategoryRetrieveUpdateDestroyAPI.as_view(), name='category-detail'),  # ✅ use the correct view and `id` as lookup_field
 
-    # Transaction routes
-    # path('transactions/', TransactionSerializer.as_view(), name='transaction-list-create'),
-    # path('transactions/<uuid:pk>/', TransactionSerializer.as_view(), name='transaction-detail'),
+        path('transactions/', TransactionListCreateAPI.as_view()),
+    path('transactions/<uuid:id>/', TransactionRetrieveUpdateDestroyAPI.as_view()),
 ]
