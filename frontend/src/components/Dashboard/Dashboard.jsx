@@ -5,7 +5,8 @@ import ExpenseChart from "./ExpenseChart";
 import { useAuth } from "../../context/AuthContext"
 import axiosInstance from "../../utils/axiosInstance";
 
-const API_BASE_URL = "http://127.0.0.1:8000/api";
+//const API_BASE_URL = "http://127.0.0.1:8000/api";
+const API_BASE_URL = "http://192.158.30.180/api";
 
 const Dashboard = () => {
   const { token, user } = useAuth(); 
