@@ -32,8 +32,9 @@ export const AuthProvider = ({ children }) => {
 
     const login = async (email, password) => {
         try {
-            const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
-                email,
+            // const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
+            const response = await axios.post("http://192.158.30.180/api/auth/login/", {
+            email,
                 password,
             });
 
@@ -56,7 +57,8 @@ export const AuthProvider = ({ children }) => {
 
     const register = async (formData) => {
         try {
-            await axios.post("http://127.0.0.1:8000/api/auth/register/", formData);
+            // await axios.post("http://127.0.0.1:8000/api/auth/register/", formData);
+            await axios.post("http://192.158.30.180/api/auth/register/", formData);
             message.success("Registration successful!");
             navigate("/login");
         } catch (error) {
