@@ -3,8 +3,8 @@ import { Modal, Button, Input, message, List, Select } from "antd";
 import axios from "axios";
 
 const { Option } = Select;
-//const API_BASE_URL = "http://127.0.0.1:8000/api/categories";
-const API_BASE_URL = "http://192.158.30.180/api/categories";
+const API_BASE_URL = "http://127.0.0.1:8000/api/categories";
+//const API_BASE_URL = "http://192.158.30.180/api/categories";
 const token = localStorage.getItem("token");
 
 const axiosInstance = axios.create({
