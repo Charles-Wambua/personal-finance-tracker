@@ -33,8 +33,8 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
          const response = await axios.post("http://127.0.0.1:8000/api/auth/login/", {
-          //  const response = await axios.post("http://192.158.30.180/api/auth/login/", {
-            email,
+
+                email,
                 password,
             });
 
